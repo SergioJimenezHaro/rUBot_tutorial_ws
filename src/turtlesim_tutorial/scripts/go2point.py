@@ -3,7 +3,8 @@ import rospy
 from geometry_msgs.msg import Twist
 from turtlesim.msg import Pose
 from math import pow, atan2, sqrt
-
+global d
+global angulo
 
 class TurtleBot:
 
@@ -55,9 +56,10 @@ class TurtleBot:
         # Get the input from the user.
         goal_pose.x = float(input("Set your x goal: "))
         goal_pose.y = float(input("Set your y goal: "))
+        angulo = float(input("Set your angle goal: "))
 
         # Please, insert a number slightly greater than 0 (e.g. 0.01).
-        distance_tolerance = float(input("Set your tolerance: "))
+        distance_tolerance = 0.01
 
         vel_msg = Twist()
 
@@ -83,8 +85,17 @@ class TurtleBot:
             self.rate.sleep()
 
         # Stopping our robot after the movement is over.
-        vel_msg.linear.x = 0
+        d = self.angular_vel(goal_pose)
+        vel_msg.angular.x = 0
         vel_msg.angular.z = 0
+        
+        print(d)
+        self.velocity_publisher.publish(vel_msg)
+        vel_msg.angular.x = 0        
+        vel_msg.angular.z = ((angulo-self.angular_vel(goal_pose))/57.14)
+        
+      
+
         self.velocity_publisher.publish(vel_msg)
 
         # If we press control + C, the node will stop.
